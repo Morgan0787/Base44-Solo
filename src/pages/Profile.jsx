@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -25,13 +25,13 @@ export default function Profile() {
     // Check auth
     const { data: user, isLoading: userLoading } = useQuery({
         queryKey: ['currentUser'],
-        queryFn: () => base44.auth.me(),
+        queryFn: () => apiClient.auth.me(),
     });
 
     // Get student profile
     const { data: profiles = [], isLoading: profileLoading } = useQuery({
         queryKey: ['studentProfile', user?.email],
-        queryFn: () => base44.entities.StudentProfile.filter({ created_by: user?.email }),
+        queryFn: () => apiClient.entities.StudentProfile.filter({ created_by: user?.email }),
         enabled: !!user?.email,
     });
 
@@ -40,7 +40,7 @@ export default function Profile() {
     // Get saved universities
     const { data: universities = [] } = useQuery({
         queryKey: ['universities'],
-        queryFn: () => base44.entities.University.list(),
+        queryFn: () => apiClient.entities.University.list(),
     });
 
     const savedUniversities = universities.filter(uni => 
@@ -51,9 +51,9 @@ export default function Profile() {
     const saveProfileMutation = useMutation({
         mutationFn: async (data) => {
             if (profile) {
-                return base44.entities.StudentProfile.update(profile.id, data);
+                return apiClient.entities.StudentProfile.update(profile.id, data);
             } else {
-                return base44.entities.StudentProfile.create(data);
+                return apiClient.entities.StudentProfile.create(data);
             }
         },
         onSuccess: () => {
@@ -66,7 +66,7 @@ export default function Profile() {
     const removeSavedMutation = useMutation({
         mutationFn: async (universityId) => {
             const newSaved = (profile?.saved_universities || []).filter(id => id !== universityId);
-            return base44.entities.StudentProfile.update(profile.id, { saved_universities: newSaved });
+            return apiClient.entities.StudentProfile.update(profile.id, { saved_universities: newSaved });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['studentProfile'] });
@@ -95,7 +95,7 @@ export default function Profile() {
                     <p className="text-slate-600 mb-6">
                         {t('profile.createAccount')}
                     </p>
-                    <Button onClick={() => base44.auth.redirectToLogin()} className="bg-indigo-600 hover:bg-indigo-700">
+                    <Button onClick={() => apiClient.auth.redirectToLogin()} className="bg-indigo-600 hover:bg-indigo-700">
                         {t('profile.signUp')}
                     </Button>
                 </Card>

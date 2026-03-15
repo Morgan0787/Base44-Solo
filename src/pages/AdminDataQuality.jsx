@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ export default function AdminDataQuality() {
     React.useEffect(() => {
         const checkUser = async () => {
             try {
-                const currentUser = await base44.auth.me();
+                const currentUser = await apiClient.auth.me();
                 setUser(currentUser);
             } catch (e) {
                 setUser(null);
@@ -47,7 +47,7 @@ export default function AdminDataQuality() {
             };
             
             // Fetch all universities
-            const universities = await base44.entities.University.list(null, 5000);
+            const universities = await apiClient.entities.University.list(null, 5000);
             
             // Helper functions
             const hasCorruptedText = (text) => {
@@ -225,7 +225,7 @@ export default function AdminDataQuality() {
                 
                 // Update record if needed
                 if (needsUpdate) {
-                    await base44.entities.University.update(universityId, updatedData);
+                    await apiClient.entities.University.update(universityId, updatedData);
                     issues.fixed_records.push({
                         id: universityId,
                         name: data.name,
@@ -269,7 +269,7 @@ export default function AdminDataQuality() {
             toast.loading('Detecting duplicates...', { id: 'duplicates' });
             
             // Fetch all universities
-            const universities = await base44.entities.University.list(null, 5000);
+            const universities = await apiClient.entities.University.list(null, 5000);
             
             // Group by name (case-insensitive)
             const nameGroups = {};
@@ -340,7 +340,7 @@ export default function AdminDataQuality() {
                 
                 // Delete duplicates
                 for (const uni of toDelete) {
-                    await base44.entities.University.delete(uni.id);
+                    await apiClient.entities.University.delete(uni.id);
                     totalRemoved++;
                 }
                 

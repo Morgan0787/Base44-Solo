@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
+import { invokeAI } from '@/lib/aiService';
 import { 
     X, Sparkles, Lock, TrendingUp, DollarSign, Globe, 
     GraduationCap, Award, Shield, CheckCircle2, AlertCircle 
@@ -55,7 +56,7 @@ Provide a brief comparison covering:
 
 Keep it under 150 words, practical and direct.`;
 
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await invokeAI({
                 prompt: prompt,
                 add_context_from_internet: false
             });
@@ -70,7 +71,7 @@ Keep it under 150 words, practical and direct.`;
 
     const handlePersonalizedAction = async (action) => {
         try {
-            const isAuth = await base44.auth.isAuthenticated();
+            const isAuth = await apiClient.auth.isAuthenticated();
             if (!isAuth || !userProfile) {
                 setShowLoginGate(true);
                 return;
@@ -117,7 +118,7 @@ ${i + 1}. ${uni.name}
 
 Which university is the best match and why? Consider their qualifications, budget, and admission chances. Be direct and specific. Under 200 words.`;
 
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await invokeAI({
                 prompt: prompt,
                 add_context_from_internet: false
             });
@@ -137,7 +138,7 @@ Which university is the best match and why? Consider their qualifications, budge
 
     const saveComparison = async () => {
         try {
-            const user = await base44.auth.me();
+            const user = await apiClient.auth.me();
             alert('Comparison saved! (Feature coming soon)');
         } catch (e) {
             setShowLoginGate(true);
@@ -145,7 +146,7 @@ Which university is the best match and why? Consider their qualifications, budge
     };
 
     const handleLoginRedirect = () => {
-        base44.auth.redirectToLogin();
+        apiClient.auth.redirectToLogin();
     };
 
     if (universities.length === 0) return null;

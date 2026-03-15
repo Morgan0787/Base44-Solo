@@ -3,7 +3,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const missingConfigMessage = 'Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.';
 
-const ENTITY_TABLE_MAP = {
+const TABLE_MAP = {
   University: import.meta.env.VITE_TABLE_UNIVERSITY || 'universities',
   StudentProfile: import.meta.env.VITE_TABLE_STUDENT_PROFILE || 'student_profiles',
   UserFeedback: import.meta.env.VITE_TABLE_USER_FEEDBACK || 'user_feedback',
@@ -51,7 +51,7 @@ const normalizeSort = (sort) => {
 };
 
 const entityClient = (entityName) => {
-  const table = ENTITY_TABLE_MAP[entityName] || entityName;
+  const table = TABLE_MAP[entityName] || entityName;
 
   return {
     list: async (sort = null, limit = 1000) => {
@@ -129,29 +129,33 @@ const auth = {
   },
 };
 
-const integrations = {
-  Core: {
-    InvokeLLM: async (payload) => {
-      const functionName = import.meta.env.VITE_LLM_FUNCTION_NAME || 'invoke-llm';
-      const data = await request(`/functions/v1/${functionName}`, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      if (typeof data === 'string') return data;
-      return data?.result || data?.text || JSON.stringify(data);
-    },
-  },
+const aiInvoke = async (payload) => {
+  const functionName = import.meta.env.VITE_LLM_FUNCTION_NAME || 'invoke-llm';
+  const data = await request(`/functions/v1/${functionName}`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  if (typeof data === 'string') return data;
+  return data?.result || data?.text || JSON.stringify(data);
 };
 
-export const base44 = {
+const ai = {
+  invoke: aiInvoke,
+};
+
+export const apiClient = {
   auth,
   entities: {
     University: entityClient('University'),
     StudentProfile: entityClient('StudentProfile'),
     UserFeedback: entityClient('UserFeedback'),
   },
-  integrations,
+  ai,
   appLogs: {
     logUserInApp: async () => true,
   },
 };
+
+export const authClient = apiClient.auth;
+export const entitiesClient = apiClient.entities;
+export const aiClient = apiClient.ai;

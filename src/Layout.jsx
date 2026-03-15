@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
 import { Button } from "@/components/ui/button";
 import { 
     GraduationCap, Search, User, Menu, X, LogOut, 
@@ -34,7 +34,7 @@ function LayoutContent({ children, currentPageName }) {
     useEffect(() => {
         const checkUser = async () => {
             try {
-                const currentUser = await base44.auth.me();
+                const currentUser = await apiClient.auth.me();
                 setUser(currentUser);
             } catch (e) {
                 setUser(null);
@@ -52,7 +52,7 @@ function LayoutContent({ children, currentPageName }) {
     }, []);
 
     const handleLogout = () => {
-        base44.auth.logout();
+        apiClient.auth.logout();
     };
 
     return (
@@ -138,13 +138,13 @@ function LayoutContent({ children, currentPageName }) {
                                 <>
                                     <Button 
                                         variant="ghost" 
-                                        onClick={() => base44.auth.redirectToLogin()}
+                                        onClick={() => apiClient.auth.redirectToLogin()}
                                     >
                                         {t('nav.signIn')}
                                     </Button>
                                     <Button 
                                         className="bg-indigo-600 hover:bg-indigo-700"
-                                        onClick={() => base44.auth.redirectToLogin()}
+                                        onClick={() => apiClient.auth.redirectToLogin()}
                                     >
                                         {t('nav.getStarted')}
                                     </Button>
@@ -205,7 +205,7 @@ function LayoutContent({ children, currentPageName }) {
                                 ) : (
                                     <Button 
                                         className="w-full bg-indigo-600 hover:bg-indigo-700"
-                                        onClick={() => base44.auth.redirectToLogin()}
+                                        onClick={() => apiClient.auth.redirectToLogin()}
                                     >
                                         {t('nav.signIn')} / {t('nav.getStarted')}
                                     </Button>

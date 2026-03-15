@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
+import { invokeAI } from '@/lib/aiService';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,7 @@ Student Profile:
 - Preferred Study Languages: ${profile.preferred_languages?.join(', ') || 'Not specified'}
 ` : 'No profile information available.';
 
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await invokeAI({
                 prompt: `You are a university admissions essay consultant helping a student from ${profile?.home_country || 'Uzbekistan'} brainstorm essay topics for international university applications.
 
 ${contextInfo}
@@ -87,7 +88,7 @@ Also provide 3 general essay prompts commonly used by universities.`,
                 <CardContent className="py-12 text-center">
                     <User className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                     <p className="text-slate-500 mb-4">Sign in to get personalized essay ideas</p>
-                    <Button onClick={() => base44.auth.redirectToLogin()}>
+                    <Button onClick={() => apiClient.auth.redirectToLogin()}>
                         Sign In
                     </Button>
                 </CardContent>

@@ -1,5 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+<<<<<<< HEAD
 import { base44 } from '@/api/base44Client';
+=======
+import { apiClient } from '@/lib/apiClient';
+>>>>>>> 194af24 (Complete Base44 to Supabase migration)
 
 const AuthContext = createContext();
 
@@ -32,7 +36,7 @@ export const AuthProvider = ({ children }) => {
   const checkUserAuth = async () => {
     try {
       setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
+      const currentUser = await apiClient.auth.me();
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
@@ -47,14 +51,14 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     if (shouldRedirect) {
-      base44.auth.logout(window.location.href);
+      apiClient.auth.logout(window.location.href);
     } else {
-      base44.auth.logout();
+      apiClient.auth.logout();
     }
   };
 
   const navigateToLogin = () => {
-    base44.auth.redirectToLogin(window.location.href);
+    apiClient.auth.redirectToLogin(window.location.href);
   };
 
   return (

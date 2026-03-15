@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,7 @@ export default function AdminFeedback() {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const currentUser = await base44.auth.me();
+                const currentUser = await apiClient.auth.me();
                 setUser(currentUser);
                 setIsAdmin(currentUser.role === 'admin');
             } catch (e) {
@@ -27,7 +27,7 @@ export default function AdminFeedback() {
 
     const { data: feedbackList = [], isLoading } = useQuery({
         queryKey: ['user-feedback'],
-        queryFn: () => base44.entities.UserFeedback.list('-created_date', 100),
+        queryFn: () => apiClient.entities.UserFeedback.list('-created_date', 100),
         enabled: isAdmin,
     });
 
