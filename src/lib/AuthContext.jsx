@@ -1,7 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { appParams } from '@/lib/app-params';
-import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
 const AuthContext = createContext();
 
@@ -21,38 +19,9 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
-      const appClient = createAxiosClient({
-        baseURL: `/api/apps/public`,
-        headers: { 'X-App-Id': appParams.appId },
-        token: appParams.token,
-        interceptResponses: true
-      });
-      try {
-        const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
-        setAppPublicSettings(publicSettings);
-        if (appParams.token) {
-          await checkUserAuth();
-        } else {
-          setIsLoadingAuth(false);
-          setIsAuthenticated(false);
-        }
-        setIsLoadingPublicSettings(false);
-      } catch (appError) {
-        if (appError.status === 403 && appError.data?.extra_data?.reason) {
-          const reason = appError.data.extra_data.reason;
-          if (reason === 'auth_required') {
-            setAuthError({ type: 'auth_required', message: 'Authentication required' });
-          } else if (reason === 'user_not_registered') {
-            setAuthError({ type: 'user_not_registered', message: 'User not registered for this app' });
-          } else {
-            setAuthError({ type: reason, message: appError.message });
-          }
-        } else {
-          setAuthError({ type: 'unknown', message: appError.message || 'Failed to load app' });
-        }
-        setIsLoadingPublicSettings(false);
-        setIsLoadingAuth(false);
-      }
+      setAppPublicSettings({ auth_required: false });
+      await checkUserAuth();
+      setIsLoadingPublicSettings(false);
     } catch (error) {
       setAuthError({ type: 'unknown', message: error.message || 'An unexpected error occurred' });
       setIsLoadingPublicSettings(false);
@@ -70,9 +39,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
-      if (error.status === 401 || error.status === 403) {
-        setAuthError({ type: 'auth_required', message: 'Authentication required' });
-      }
+      setAuthError(null);
     }
   };
 
