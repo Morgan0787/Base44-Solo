@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MessageSquarePlus, CheckCircle2 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 export default function FeedbackButton() {
@@ -25,7 +25,7 @@ export default function FeedbackButton() {
         }
         setIsSubmitting(true);
         try {
-            await base44.entities.UserFeedback.create({ feedback_type: feedbackType, message: message.trim(), email: email.trim() || null, page_url: window.location.href });
+            await apiClient.entities.UserFeedback.create({ feedback_type: feedbackType, message: message.trim(), email: email.trim() || null, page_url: window.location.href });
             setShowSuccess(true);
             setTimeout(() => {
                 setMessage('');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -29,8 +29,8 @@ export default function Search() {
     const [userProfile, setUserProfile] = useState(null);
 
     useEffect(() => { localStorage.setItem('uniAdmitFilters', JSON.stringify(filters)); }, [filters]);
-    const { data: universities = [], isLoading } = useQuery({ queryKey: ['universities'], queryFn: () => base44.entities.University.list() });
-    useEffect(() => { const loadProfile = async () => { try { const profile = await base44.entities.StudentProfile.filter({ created_by: (await base44.auth.me()).email }); if (profile.length > 0) { setUserProfile(profile[0]); setSavedUniversities(profile[0].saved_universities || []); if (profile[0].gpa) setFilters(f => ({ ...f, gpa: profile[0].gpa })); if (profile[0].english_proficiency !== undefined) setFilters(f => ({ ...f, ielts: profile[0].english_proficiency })); if (profile[0].budget_max) setFilters(f => ({ ...f, budget: profile[0].budget_max })); if (profile[0].topikLevel) setFilters(f => ({ ...f, topikLevel: profile[0].topikLevel })); } } catch (e) {} }; loadProfile(); }, []);
+    const { data: universities = [], isLoading } = useQuery({ queryKey: ['universities'], queryFn: () => apiClient.entities.University.list() });
+    useEffect(() => { const loadProfile = async () => { try { const profile = await apiClient.entities.StudentProfile.filter({ created_by: (await apiClient.auth.me()).email }); if (profile.length > 0) { setUserProfile(profile[0]); setSavedUniversities(profile[0].saved_universities || []); if (profile[0].gpa) setFilters(f => ({ ...f, gpa: profile[0].gpa })); if (profile[0].english_proficiency !== undefined) setFilters(f => ({ ...f, ielts: profile[0].english_proficiency })); if (profile[0].budget_max) setFilters(f => ({ ...f, budget: profile[0].budget_max })); if (profile[0].topikLevel) setFilters(f => ({ ...f, topikLevel: profile[0].topikLevel })); } } catch (e) {} }; loadProfile(); }, []);
 
     const filteredUniversities = universities.filter(uni => {
         if (searchQuery) {
@@ -68,9 +68,9 @@ export default function Search() {
         try {
             const newSaved = savedUniversities.includes(universityId) ? savedUniversities.filter(id => id !== universityId) : [...savedUniversities, universityId];
             setSavedUniversities(newSaved);
-            const user = await base44.auth.me();
-            const profiles = await base44.entities.StudentProfile.filter({ created_by: user.email });
-            if (profiles.length > 0) await base44.entities.StudentProfile.update(profiles[0].id, { saved_universities: newSaved });
+            const user = await apiClient.auth.me();
+            const profiles = await apiClient.entities.StudentProfile.filter({ created_by: user.email });
+            if (profiles.length > 0) await apiClient.entities.StudentProfile.update(profiles[0].id, { saved_universities: newSaved });
         } catch (e) {}
     };
 

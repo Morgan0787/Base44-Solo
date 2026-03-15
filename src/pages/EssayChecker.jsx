@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
+import { invokeAI } from '@/lib/aiService';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,12 +25,12 @@ export default function EssayChecker() {
     // Fetch user profile for brainstorming context
     const { data: user } = useQuery({
         queryKey: ['currentUser'],
-        queryFn: () => base44.auth.me(),
+        queryFn: () => apiClient.auth.me(),
     });
 
     const { data: profiles = [] } = useQuery({
         queryKey: ['studentProfile', user?.email],
-        queryFn: () => base44.entities.StudentProfile.filter({ created_by: user?.email }),
+        queryFn: () => apiClient.entities.StudentProfile.filter({ created_by: user?.email }),
         enabled: !!user?.email,
     });
 
@@ -48,7 +49,7 @@ export default function EssayChecker() {
 
         setIsAnalyzing(true);
         try {
-            const result = await base44.integrations.Core.InvokeLLM({
+            const result = await invokeAI({
                 prompt: `You are an expert university admissions essay consultant. Analyze the following university application essay and provide detailed, constructive feedback.
 
 Essay:

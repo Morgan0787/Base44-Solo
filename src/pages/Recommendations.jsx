@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import { apiClient } from '@/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
@@ -327,7 +327,7 @@ export default function Recommendations() {
     
     const { data: universities = [], isLoading: loadingUniversities } = useQuery({
         queryKey: ['universities', new Date().toISOString().split('T')[0]], // Daily cache key
-        queryFn: () => base44.entities.University.list(),
+        queryFn: () => apiClient.entities.University.list(),
         staleTime: 1000 * 60 * 60, // 1 hour
         refetchOnMount: 'always',
         refetchOnWindowFocus: true,
@@ -336,8 +336,8 @@ export default function Recommendations() {
     useEffect(() => {
         const loadProfile = async () => {
             try {
-                const user = await base44.auth.me();
-                const profiles = await base44.entities.StudentProfile.filter({ created_by: user.email });
+                const user = await apiClient.auth.me();
+                const profiles = await apiClient.entities.StudentProfile.filter({ created_by: user.email });
                 if (profiles.length > 0) {
                     setUserProfile(profiles[0]);
                     setSavedUniversities(profiles[0].saved_universities || []);
@@ -365,10 +365,10 @@ export default function Recommendations() {
                 : [...savedUniversities, universityId];
             setSavedUniversities(newSaved);
             
-            const user = await base44.auth.me();
-            const profiles = await base44.entities.StudentProfile.filter({ created_by: user.email });
+            const user = await apiClient.auth.me();
+            const profiles = await apiClient.entities.StudentProfile.filter({ created_by: user.email });
             if (profiles.length > 0) {
-                await base44.entities.StudentProfile.update(profiles[0].id, { saved_universities: newSaved });
+                await apiClient.entities.StudentProfile.update(profiles[0].id, { saved_universities: newSaved });
             }
         } catch (e) {
             // Handle error
