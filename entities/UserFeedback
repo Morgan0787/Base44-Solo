@@ -1,0 +1,306 @@
+{
+  "name": "University",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "University name"
+    },
+    "country": {
+      "type": "string",
+      "description": "Country where university is located"
+    },
+    "city": {
+      "type": "string",
+      "description": "City location"
+    },
+    "region": {
+      "type": "string",
+      "enum": [
+        "Europe",
+        "North America",
+        "Asia",
+        "Middle East",
+        "Oceania",
+        "South America"
+      ],
+      "description": "Geographic region"
+    },
+    "tuition_min": {
+      "type": "number",
+      "description": "Minimum annual tuition in EUR"
+    },
+    "tuition_max": {
+      "type": "number",
+      "description": "Maximum annual tuition in EUR"
+    },
+    "living_cost_estimate": {
+      "type": "number",
+      "description": "Estimated annual living costs in EUR"
+    },
+    "min_gpa": {
+      "type": "number",
+      "description": "Minimum GPA required (on 4.0 scale)"
+    },
+    "required_ielts": {
+      "type": "number",
+      "description": "Required IELTS score (null if not required or unknown)"
+    },
+    "topikLevel": {
+      "type": "string",
+      "enum": [
+        "TOPIK 2",
+        "TOPIK 3",
+        "TOPIK 4",
+        "TOPIK 5",
+        "TOPIK 6"
+      ],
+      "description": "Required TOPIK level for Korean-taught programs (null for English programs)"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "English",
+        "German",
+        "French",
+        "Spanish",
+        "Italian",
+        "Dutch",
+        "Russian",
+        "Mixed"
+      ],
+      "description": "Primary language of instruction"
+    },
+    "degree_levels": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Bachelor",
+          "Master",
+          "PhD"
+        ]
+      },
+      "description": "Available degree levels"
+    },
+    "acceptance_rate": {
+      "type": "number",
+      "description": "Acceptance rate percentage"
+    },
+    "ranking": {
+      "type": "number",
+      "description": "World ranking (if applicable)"
+    },
+    "scholarships_available": {
+      "type": "boolean",
+      "description": "Whether scholarships are available"
+    },
+    "application_deadline": {
+      "type": "string",
+      "description": "Main application deadline"
+    },
+    "notable_programs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Notable study programs"
+    },
+    "website": {
+      "type": "string",
+      "description": "University website URL"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the university"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "University image URL"
+    },
+    "international_students_percent": {
+      "type": "number",
+      "description": "Percentage of international students"
+    },
+    "campus_life": {
+      "type": "object",
+      "properties": {
+        "housing_available": {
+          "type": "boolean",
+          "description": "Student housing available"
+        },
+        "housing_cost_monthly": {
+          "type": "number",
+          "description": "Average monthly housing cost in EUR"
+        },
+        "student_organizations": {
+          "type": "number",
+          "description": "Number of student organizations"
+        },
+        "sports_facilities": {
+          "type": "boolean",
+          "description": "Sports facilities available"
+        },
+        "cafeterias": {
+          "type": "number",
+          "description": "Number of cafeterias on campus"
+        },
+        "campus_description": {
+          "type": "string",
+          "description": "Description of campus life"
+        },
+        "city_description": {
+          "type": "string",
+          "description": "Description of the city"
+        }
+      },
+      "description": "Campus life information"
+    },
+    "international_support": {
+      "type": "object",
+      "properties": {
+        "international_office": {
+          "type": "boolean",
+          "description": "Dedicated international student office"
+        },
+        "orientation_program": {
+          "type": "boolean",
+          "description": "Orientation program for international students"
+        },
+        "language_courses": {
+          "type": "boolean",
+          "description": "Free language courses available"
+        },
+        "buddy_program": {
+          "type": "boolean",
+          "description": "Student buddy/mentor program"
+        },
+        "career_services": {
+          "type": "boolean",
+          "description": "Career services for international students"
+        },
+        "support_description": {
+          "type": "string",
+          "description": "Details about international student support"
+        }
+      },
+      "description": "International student support services"
+    },
+    "visa_info": {
+      "type": "object",
+      "properties": {
+        "visa_required": {
+          "type": "boolean",
+          "description": "Visa required for international students"
+        },
+        "processing_time_weeks": {
+          "type": "number",
+          "description": "Typical visa processing time in weeks"
+        },
+        "work_allowed_hours": {
+          "type": "number",
+          "description": "Hours per week students can work"
+        },
+        "post_study_work_visa": {
+          "type": "boolean",
+          "description": "Post-study work visa available"
+        },
+        "visa_cost_eur": {
+          "type": "number",
+          "description": "Visa application cost in EUR"
+        },
+        "visa_details": {
+          "type": "string",
+          "description": "Additional visa information"
+        }
+      },
+      "description": "Visa information"
+    },
+    "scholarships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Scholarship name"
+          },
+          "amount_eur": {
+            "type": "number",
+            "description": "Scholarship amount in EUR"
+          },
+          "coverage": {
+            "type": "string",
+            "description": "What the scholarship covers"
+          },
+          "eligibility": {
+            "type": "string",
+            "description": "Eligibility criteria"
+          },
+          "deadline": {
+            "type": "string",
+            "description": "Application deadline"
+          },
+          "renewable": {
+            "type": "boolean",
+            "description": "Whether scholarship is renewable"
+          }
+        }
+      },
+      "description": "Specific scholarship opportunities"
+    },
+    "admission_requirements": {
+      "type": "object",
+      "properties": {
+        "english_test": {
+          "type": "string",
+          "description": "English test requirements (e.g., IELTS 6.5, TOEFL 90)"
+        },
+        "additional_tests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Other required tests"
+        },
+        "documents_required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Required documents"
+        },
+        "application_fee_eur": {
+          "type": "number",
+          "description": "Application fee in EUR"
+        }
+      },
+      "description": "Admission requirements"
+    },
+    "contact_info": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Contact email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone"
+        },
+        "admissions_office": {
+          "type": "string",
+          "description": "Admissions office address"
+        }
+      },
+      "description": "Contact information"
+    }
+  },
+  "required": [
+    "name",
+    "country",
+    "tuition_min",
+    "min_gpa",
+    "language"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "name": "StudentProfile",
+  "type": "object",
+  "properties": {
+    "gpa": {
+      "type": "number",
+      "description": "Student GPA on 4.0 scale"
+    },
+    "english_proficiency": {
+      "type": "number",
+      "description": "IELTS score (0 for no certificate, 5.5, 6.0, 6.5, 7.0+)",
+      "enum": [
+        0,
+        5.5,
+        6.0,
+        6.5,
+        7.0
+      ]
+    },
+    "topikLevel": {
+      "type": "string",
+      "enum": [
+        "Not taken",
+        "TOPIK 1",
+        "TOPIK 2",
+        "TOPIK 3",
+        "TOPIK 4",
+        "TOPIK 5",
+        "TOPIK 6"
+      ],
+      "description": "Student's TOPIK level for Korean language proficiency"
+    },
+    "budget_max": {
+      "type": "number",
+      "description": "Maximum annual budget in EUR"
+    },
+    "preferred_countries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Preferred countries for study"
+    },
+    "preferred_languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Languages student can study in"
+    },
+    "target_degree": {
+      "type": "string",
+      "enum": [
+        "Bachelor",
+        "Master",
+        "PhD"
+      ],
+      "description": "Target degree level"
+    },
+    "grade_level": {
+      "type": "string",
+      "enum": [
+        "Grade 10",
+        "Grade 11",
+        "Grade 12",
+        "Gap Year"
+      ],
+      "description": "Current grade level"
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Academic interests"
+    },
+    "saved_universities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of saved universities"
+    },
+    "home_country": {
+      "type": "string",
+      "description": "Student's home country"
+    }
+  },
+  "required": []
+}
