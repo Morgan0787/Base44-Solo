@@ -1,9 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-<<<<<<< HEAD
-import { base44 } from '@/api/base44Client';
-=======
 import { apiClient } from '@/lib/apiClient';
->>>>>>> 194af24 (Complete Base44 to Supabase migration)
 
 const AuthContext = createContext();
 
