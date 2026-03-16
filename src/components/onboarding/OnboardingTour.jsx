@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Search, Sparkles, MessageSquarePlus, Bookmark, GitCompare, User, ChevronRight, X } from 'lucide-react';
+import { Search, Sparkles, MessageSquarePlus, Bookmark, User, ChevronRight, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 

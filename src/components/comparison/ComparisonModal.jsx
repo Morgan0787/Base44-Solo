@@ -8,7 +8,7 @@ import { apiClient } from '@/lib/apiClient';
 import { invokeAI } from '@/lib/aiService';
 import { 
     X, Sparkles, Lock, TrendingUp, DollarSign, Globe, 
-    GraduationCap, Award, Shield, CheckCircle2, AlertCircle 
+    GraduationCap, Award, CheckCircle2, AlertCircle 
 } from 'lucide-react';
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
 import { useLanguage } from '@/components/i18n/LanguageContext';

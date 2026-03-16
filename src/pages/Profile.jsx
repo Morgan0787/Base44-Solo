@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { apiClient } from '@/lib/apiClient';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
     User, GraduationCap, Bookmark, Settings, Search, 
-    MapPin, Globe, Trash2, ExternalLink, Sparkles, ArrowRight, FileText
+    MapPin, Globe, Trash2, ExternalLink, Sparkles, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 import ProfileBuilder from '@/components/profile/ProfileBuilder';

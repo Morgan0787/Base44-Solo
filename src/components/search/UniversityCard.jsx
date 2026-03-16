@@ -7,6 +7,7 @@ import ChanceIndicator from '@/components/ui/ChanceIndicator';
 import { motion } from 'framer-motion';
 import UniversityCover from '@/components/ui/UniversityCover';
 import { useLanguage } from '@/components/i18n/LanguageContext';
+import { normalizeStringList } from '@/lib/universityNormalization';
 
 function calculateChance(university, userGpa, userIelts, userTopik) {
     if (!userGpa) return 'medium';
@@ -72,6 +73,7 @@ function calculateChance(university, userGpa, userIelts, userTopik) {
 export default function UniversityCard({ university, userGpa, userIelts, userTopik, isSaved, onSave, onView, isComparing, onCompareToggle }) {
     const { t } = useLanguage();
     const chance = calculateChance(university, userGpa, userIelts, userTopik);
+    const degreeLevels = normalizeStringList(university?.degree_levels);
     
     return (
         <motion.div
@@ -164,7 +166,7 @@ export default function UniversityCard({ university, userGpa, userIelts, userTop
                             <Globe className="w-2.5 h-2.5 mr-1" />
                             {university.language}
                         </Badge>
-                        {university.degree_levels?.slice(0, 2).map(deg => (
+                        {degreeLevels.slice(0, 2).map(deg => (
                             <Badge key={deg} variant="secondary" className="bg-indigo-50 text-indigo-600 font-normal text-[10px] px-1.5 py-0.5">
                                 {deg}
                             </Badge>

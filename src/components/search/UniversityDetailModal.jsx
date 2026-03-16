@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,12 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
     MapPin, Globe, GraduationCap, Bookmark, BookmarkCheck, 
     ExternalLink, Award, Calendar, Users, TrendingUp, DollarSign,
-    Building2, BookOpen, Home, Heart, Briefcase, FileText,
-    Shield, Clock, Phone, Mail, CheckCircle2, Info, ChevronRight
+    Building2, BookOpen, Home, Heart, Shield, Phone, Mail, CheckCircle2, Info, ChevronRight
 } from 'lucide-react';
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
 import UniversityCover from '@/components/ui/UniversityCover';
 import { useLanguage } from '@/components/i18n/LanguageContext';
+import { normalizeObjectList, normalizeStringList } from '@/lib/universityNormalization';
 
 function calculateChance(university, userGpa, userIelts, userTopik) {
     if (!userGpa) return 'medium';
@@ -83,6 +83,9 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
     
     const chance = calculateChance(university, userGpa, userIelts, userTopik);
     const totalCost = (university.tuition_min || 0) + (university.living_cost_estimate || 8000);
+    const degreeLevels = normalizeStringList(university.degree_levels);
+    const notablePrograms = normalizeStringList(university.notable_programs);
+    const scholarships = normalizeObjectList(university.scholarships);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -218,18 +221,18 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                                                 <Globe className="w-3 h-3 mr-1" />
                                                 {university.language}
                                             </Badge>
-                                            {university.degree_levels?.map(deg => (
+                                            {degreeLevels.map(deg => (
                                                 <Badge key={deg} variant="secondary" className="bg-indigo-50 text-indigo-600">
                                                     <GraduationCap className="w-3 h-3 mr-1" />
                                                     {deg}
                                                 </Badge>
                                             ))}
                                         </div>
-                                        {university.notable_programs?.length > 0 && (
+                                        {notablePrograms.length > 0 && (
                                             <div>
                                                 <p className="text-sm font-medium text-slate-700 mb-2">{t('university.notablePrograms')}</p>
                                                 <div className="flex flex-wrap gap-1.5 max-w-full">
-                                                    {university.notable_programs.map((prog, i) => (
+                                                    {notablePrograms.map((prog, i) => (
                                                         <Badge key={i} variant="outline" className="font-normal text-xs break-words">
                                                             {prog}
                                                         </Badge>
@@ -538,9 +541,9 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                             <ChevronRight className="w-5 h-5 text-slate-400" />
                         </CollapsibleTrigger>
                         <CollapsibleContent className="pt-4">
-                            {university.scholarships && university.scholarships.length > 0 ? (
+                            {scholarships.length > 0 ? (
                                 <div className="space-y-4">
-                                    {university.scholarships.map((scholarship, index) => (
+                                    {scholarships.map((scholarship, index) => (
                                         <Card key={index}>
                                             <CardHeader>
                                                 <div className="flex items-start justify-between">

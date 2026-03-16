@@ -13,6 +13,7 @@ import UniversityCard from '@/components/search/UniversityCard';
 import UniversityDetailModal from '@/components/search/UniversityDetailModal';
 import ComparisonModal from '@/components/comparison/ComparisonModal';
 import { useLanguage } from '@/components/i18n/LanguageContext';
+import { normalizeUniversity } from '@/lib/universityNormalization';
 
 export default function Search() {
     const { t } = useLanguage();
@@ -29,7 +30,13 @@ export default function Search() {
     const [userProfile, setUserProfile] = useState(null);
 
     useEffect(() => { localStorage.setItem('uniAdmitFilters', JSON.stringify(filters)); }, [filters]);
-    const { data: universities = [], isLoading } = useQuery({ queryKey: ['universities'], queryFn: () => apiClient.entities.University.list() });
+    const { data: universities = [], isLoading } = useQuery({
+        queryKey: ['universities'],
+        queryFn: async () => {
+            const data = await apiClient.entities.University.list();
+            return data.map(normalizeUniversity);
+        }
+    });
     useEffect(() => { const loadProfile = async () => { try { const profile = await apiClient.entities.StudentProfile.filter({ created_by: (await apiClient.auth.me()).email }); if (profile.length > 0) { setUserProfile(profile[0]); setSavedUniversities(profile[0].saved_universities || []); if (profile[0].gpa) setFilters(f => ({ ...f, gpa: profile[0].gpa })); if (profile[0].english_proficiency !== undefined) setFilters(f => ({ ...f, ielts: profile[0].english_proficiency })); if (profile[0].budget_max) setFilters(f => ({ ...f, budget: profile[0].budget_max })); if (profile[0].topikLevel) setFilters(f => ({ ...f, topikLevel: profile[0].topikLevel })); } } catch (e) {} }; loadProfile(); }, []);
 
     const filteredUniversities = universities.filter(uni => {
