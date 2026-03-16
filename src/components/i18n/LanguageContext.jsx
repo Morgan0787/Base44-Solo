@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { translations } from './translations';
-const LanguageContext = createContext();
+const LanguageContext = createContext(null);
 export const LanguageProvider = ({ children }) => {
     const [language, setLanguage] = useState(() => localStorage.getItem('uniAdmitLanguage') || 'en');
     useEffect(() => { localStorage.setItem('uniAdmitLanguage', language); document.documentElement.lang = language; }, [language]);

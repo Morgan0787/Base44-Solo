@@ -600,6 +600,7 @@ export default function Recommendations() {
                 onClose={() => setSelectedUniversity(null)}
                 userGpa={userProfile?.gpa}
                 userIelts={userProfile?.english_proficiency}
+                userTopik={userProfile?.topikLevel || "Not taken"}
                 isSaved={selectedUniversity && savedUniversities.includes(selectedUniversity.id)}
                 onSave={handleSave}
             />
