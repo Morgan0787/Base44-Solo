@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Globe } from 'lucide-react';
-import { useLanguage } from './LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 const languages = [
     { code: 'en', name: 'English', flag: '🇬🇧' },

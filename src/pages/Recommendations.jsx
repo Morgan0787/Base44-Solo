@@ -20,7 +20,7 @@ import UniversityCover from '@/components/ui/UniversityCover';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 function calculateMatchScore(university, profile, countryWeights = {}) {
     let score = 0;
@@ -560,7 +560,7 @@ export default function Recommendations() {
                         <div className="mb-6 flex items-center justify-between">
                             <div>
                                 <h2 className="text-xl font-semibold text-slate-800">
-                                    {t('recommendations.topMatches').replace('{count}', recommendedUniversities.length)}
+                                    {t('recommendations.topMatches', { count: recommendedUniversities.length })}
                                 </h2>
                                 <p className="text-slate-500">{t('recommendations.sortedByMatch')}</p>
                             </div>

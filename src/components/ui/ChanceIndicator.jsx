@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 export default function ChanceIndicator({ chance, size = "default" }) {
     const { t } = useLanguage();

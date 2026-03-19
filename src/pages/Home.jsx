@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { GraduationCap, Search, Sparkles, Globe2, Shield, Users, ArrowRight, CheckCircle2, Star, TrendingUp, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import OnboardingTour from '@/components/onboarding/OnboardingTour';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 export default function Home() {
     const { t } = useLanguage();

@@ -10,7 +10,7 @@ import {
     Calendar, Database, Loader2, ShieldAlert, Users
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 export default function AdminDataQuality() {
     const [user, setUser] = useState(null);
