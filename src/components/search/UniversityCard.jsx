@@ -6,7 +6,7 @@ import { MapPin, Globe, Bookmark, BookmarkCheck, ExternalLink, Award, GitCompare
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
 import { motion } from 'framer-motion';
 import UniversityCover from '@/components/ui/UniversityCover';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 function calculateChance(university, userGpa, userIelts, userTopik) {
     if (!userGpa) return 'medium';

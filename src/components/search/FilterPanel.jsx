@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, ChevronDown } from 'lucide-react';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 const countries = ["Germany", "Netherlands", "Czech Republic", "Poland", "Hungary", "Austria", "France", "Italy", "Spain", "Portugal", "Belgium", "Sweden", "Finland", "Norway", "Denmark", "Switzerland", "United Kingdom", "Ireland", "USA", "Canada", "Australia", "China", "South Korea", "Japan", "Singapore", "Malaysia", "UAE"];
 const languages = ["English", "German", "French", "Spanish", "Italian", "Dutch", "Russian", "Mixed"];

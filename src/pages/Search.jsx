@@ -12,7 +12,7 @@ import FilterPanel from '@/components/search/FilterPanel';
 import UniversityCard from '@/components/search/UniversityCard';
 import UniversityDetailModal from '@/components/search/UniversityDetailModal';
 import ComparisonModal from '@/components/comparison/ComparisonModal';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 export default function Search() {
     const { t } = useLanguage();

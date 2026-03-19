@@ -11,7 +11,7 @@ import {
     GraduationCap, Award, Shield, CheckCircle2, AlertCircle 
 } from 'lucide-react';
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 export default function ComparisonModal({ universities, isOpen, onClose, onRemove, userProfile }) {
     const { language } = useLanguage();
