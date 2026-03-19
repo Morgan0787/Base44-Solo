@@ -6,6 +6,9 @@ import Profile from './pages/Profile';
 import Recommendations from './pages/Recommendations';
 import Search from './pages/Search';
 import __Layout from './Layout.jsx';
+import Login from './pages/Login';
+   // and in PAGES object:
+   "Login": Login,
 
 export const PAGES = {
     "AdminDataQuality": AdminDataQuality,
