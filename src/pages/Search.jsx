@@ -14,13 +14,44 @@ import UniversityDetailModal from '@/components/search/UniversityDetailModal';
 import ComparisonModal from '@/components/comparison/ComparisonModal';
 import { useLanguage } from '@/lib/i18n';
 
+const DEFAULT_FILTERS = { gpa: 3.0, ielts: 0, topikLevel: "Not taken", budget: 15000, region: '', country: '', languages: [], degree: '', scholarshipsOnly: false };
+
+const toNumber = (value, fallback) => {
+    const normalized = typeof value === 'string' ? Number(value.replace(/,/g, '').trim()) : Number(value);
+    return Number.isFinite(normalized) ? normalized : fallback;
+};
+
+const normalizeFilters = (value = {}) => ({
+    ...DEFAULT_FILTERS,
+    ...(value && typeof value === 'object' ? value : {}),
+    gpa: toNumber(value?.gpa, DEFAULT_FILTERS.gpa),
+    ielts: toNumber(value?.ielts, DEFAULT_FILTERS.ielts),
+    budget: toNumber(value?.budget, DEFAULT_FILTERS.budget),
+    topikLevel: typeof value?.topikLevel === 'string' && value.topikLevel ? value.topikLevel : DEFAULT_FILTERS.topikLevel,
+    region: typeof value?.region === 'string' ? value.region : DEFAULT_FILTERS.region,
+    country: typeof value?.country === 'string' ? value.country : DEFAULT_FILTERS.country,
+    languages: Array.isArray(value?.languages) ? value.languages.filter(Boolean) : DEFAULT_FILTERS.languages,
+    degree: typeof value?.degree === 'string' ? value.degree : DEFAULT_FILTERS.degree,
+    scholarshipsOnly: Boolean(value?.scholarshipsOnly),
+});
+
+const loadSavedFilters = () => {
+    if (typeof window === 'undefined') return DEFAULT_FILTERS;
+
+    try {
+        const saved = window.localStorage.getItem('uniAdmitFilters');
+        const parsed = saved ? JSON.parse(saved) : {};
+
+        return normalizeFilters(parsed);
+    } catch {
+        return DEFAULT_FILTERS;
+    }
+};
+
 export default function Search() {
     const { t } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
-    const [filters, setFilters] = useState(() => {
-        const saved = localStorage.getItem('uniAdmitFilters');
-        return saved ? JSON.parse(saved) : { gpa: 3.0, ielts: 0, topikLevel: "Not taken", budget: 15000, region: '', country: '', languages: [], degree: '', scholarshipsOnly: false };
-    });
+    const [filters, setFilters] = useState(loadSavedFilters);
     const [selectedUniversity, setSelectedUniversity] = useState(null);
     const [savedUniversities, setSavedUniversities] = useState([]);
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -30,7 +61,7 @@ export default function Search() {
 
     useEffect(() => { localStorage.setItem('uniAdmitFilters', JSON.stringify(filters)); }, [filters]);
     const { data: universities = [], isLoading } = useQuery({ queryKey: ['universities'], queryFn: () => apiClient.entities.University.list() });
-    useEffect(() => { const loadProfile = async () => { try { const profile = await apiClient.entities.StudentProfile.filter({ created_by: (await apiClient.auth.me()).email }); if (profile.length > 0) { setUserProfile(profile[0]); setSavedUniversities(profile[0].saved_universities || []); if (profile[0].gpa) setFilters(f => ({ ...f, gpa: profile[0].gpa })); if (profile[0].english_proficiency !== undefined) setFilters(f => ({ ...f, ielts: profile[0].english_proficiency })); if (profile[0].budget_max) setFilters(f => ({ ...f, budget: profile[0].budget_max })); if (profile[0].topikLevel) setFilters(f => ({ ...f, topikLevel: profile[0].topikLevel })); } } catch (e) {} }; loadProfile(); }, []);
+    useEffect(() => { const loadProfile = async () => { try { const profile = await apiClient.entities.StudentProfile.filter({ created_by: (await apiClient.auth.me()).email }); if (profile.length > 0) { const currentProfile = profile[0] && typeof profile[0] === 'object' ? profile[0] : {}; setUserProfile(currentProfile); setSavedUniversities(Array.isArray(currentProfile.saved_universities) ? currentProfile.saved_universities : []); setFilters(f => normalizeFilters({ ...f, gpa: currentProfile.gpa ?? f.gpa, ielts: currentProfile.english_proficiency ?? f.ielts, budget: currentProfile.budget_max ?? f.budget, topikLevel: currentProfile.topikLevel ?? f.topikLevel })); } } catch (e) {} }; loadProfile(); }, []);
 
     const filteredUniversities = universities.filter(uni => {
         if (searchQuery) {
@@ -74,7 +105,7 @@ export default function Search() {
         } catch (e) {}
     };
 
-    const resetFilters = () => setFilters({ gpa: 3.0, ielts: 0, topikLevel: "Not taken", budget: 15000, region: '', country: '', languages: [], degree: '', scholarshipsOnly: false });
+    const resetFilters = () => setFilters(DEFAULT_FILTERS);
     const handleCompareToggle = (universityId) => setCompareList(prev => prev.includes(universityId) ? prev.filter(id => id !== universityId) : prev.length < 3 ? [...prev, universityId] : prev);
     const handleRemoveFromCompare = (universityId) => setCompareList(prev => prev.filter(id => id !== universityId));
     const compareUniversities = universities.filter(uni => compareList.includes(uni.id));
