@@ -50,6 +50,99 @@ const normalizeSort = (sort) => {
   return `${field}.${isDesc ? 'desc' : 'asc'}`;
 };
 
+const parseJsonString = (value) => {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  if (!trimmed) return value;
+  if (!['[', '{', '"'].includes(trimmed[0])) return value;
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return value;
+  }
+};
+
+const asArray = (value) => {
+  const parsed = parseJsonString(value);
+  if (Array.isArray(parsed)) return parsed;
+  if (typeof parsed === 'string') {
+    return parsed
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const asObject = (value) => {
+  const parsed = parseJsonString(value);
+  return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+};
+
+const asNumber = (value, fallback = 0) => {
+  const normalized = typeof value === 'string' ? Number(value.replace(/,/g, '').trim()) : Number(value);
+  return Number.isFinite(normalized) ? normalized : fallback;
+};
+
+const asNullableNumber = (value) => {
+  if (value === null || value === undefined || value === '') return null;
+  const normalized = typeof value === 'string' ? Number(value.replace(/,/g, '').trim()) : Number(value);
+  return Number.isFinite(normalized) ? normalized : null;
+};
+
+const asString = (value, fallback = '') => {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return fallback;
+};
+
+const asBoolean = (value) => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (['true', '1', 'yes'].includes(normalized)) return true;
+    if (['false', '0', 'no', ''].includes(normalized)) return false;
+  }
+  if (typeof value === 'number') return value !== 0;
+  return Boolean(value);
+};
+
+const normalizeUniversity = (university) => {
+  const row = university && typeof university === 'object' ? university : {};
+  return {
+    ...row,
+    id: row.id ?? null,
+    name: asString(row.name, 'Unknown university'),
+    country: asString(row.country),
+    city: asString(row.city),
+    region: asString(row.region),
+    language: asString(row.language),
+    website: asString(row.website),
+    image_url: asString(row.image_url),
+    description: asString(row.description),
+    application_deadline: asString(row.application_deadline),
+    topikLevel: asString(row.topikLevel),
+    degree_levels: asArray(row.degree_levels),
+    notable_programs: asArray(row.notable_programs),
+    tuition_min: asNumber(row.tuition_min, 0),
+    living_cost_estimate: asNumber(row.living_cost_estimate, 8000),
+    min_gpa: asNumber(row.min_gpa, 0),
+    required_ielts: asNullableNumber(row.required_ielts),
+    international_students_percent: asNullableNumber(row.international_students_percent),
+    scholarships_available: asBoolean(row.scholarships_available),
+    campus_life: asObject(row.campus_life),
+    admission_requirements: asObject(row.admission_requirements),
+  };
+};
+
+const normalizeEntityResult = (entityName, data) => {
+  if (entityName !== 'University') return data;
+  if (Array.isArray(data)) return data.map(normalizeUniversity);
+  if (data && typeof data === 'object') return normalizeUniversity(data);
+  return [];
+};
+
 const entityClient = (entityName) => {
   const table = TABLE_MAP[entityName] || entityName;
 
@@ -58,14 +151,16 @@ const entityClient = (entityName) => {
       const query = new URLSearchParams({ select: '*', limit: String(limit) });
       const order = normalizeSort(sort);
       if (order) query.set('order', order);
-      return request(`/rest/v1/${table}?${query.toString()}`);
+      const data = await request(`/rest/v1/${table}?${query.toString()}`);
+      return normalizeEntityResult(entityName, data);
     },
     filter: async (filters = {}, sort = null, limit = 1000) => {
       const query = new URLSearchParams({ select: '*', limit: String(limit) });
       Object.entries(filters || {}).forEach(([key, value]) => query.set(key, `eq.${value}`));
       const order = normalizeSort(sort);
       if (order) query.set('order', order);
-      return request(`/rest/v1/${table}?${query.toString()}`);
+      const data = await request(`/rest/v1/${table}?${query.toString()}`);
+      return normalizeEntityResult(entityName, data);
     },
     create: async (payload) => {
       const user = await auth.me().catch(() => null);
@@ -78,7 +173,7 @@ const entityClient = (entityName) => {
         headers: { Prefer: 'return=representation' },
         body: JSON.stringify(record),
       });
-      return data?.[0] || null;
+      return normalizeEntityResult(entityName, data?.[0] || null);
     },
     update: async (id, payload) => {
       const query = new URLSearchParams({ id: `eq.${id}`, select: '*' });
@@ -87,7 +182,7 @@ const entityClient = (entityName) => {
         headers: { Prefer: 'return=representation' },
         body: JSON.stringify(payload),
       });
-      return data?.[0] || null;
+      return normalizeEntityResult(entityName, data?.[0] || null);
     },
     delete: async (id) => {
       const query = new URLSearchParams({ id: `eq.${id}` });
