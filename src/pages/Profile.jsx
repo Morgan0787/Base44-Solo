@@ -15,7 +15,7 @@ import {
 import { toast } from 'sonner';
 import ProfileBuilder from '@/components/profile/ProfileBuilder';
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
-import { useLanguage } from '@/components/i18n/LanguageContext';
+import { useLanguage } from '@/lib/i18n';
 
 export default function Profile() {
     const { t } = useLanguage();

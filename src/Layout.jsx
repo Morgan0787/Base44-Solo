@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { apiClient } from '@/lib/apiClient';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from "@/components/ui/button";
 import { 
     GraduationCap, Search, User, Menu, X, LogOut, 
@@ -15,7 +15,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LanguageProvider, useLanguage } from '@/components/i18n/LanguageContext';
+import { LanguageProvider, useLanguage } from '@/lib/i18n';
 import LanguageSwitcher from '@/components/i18n/LanguageSwitcher';
 
 function LayoutContent({ children, currentPageName }) {
@@ -179,7 +179,7 @@ function LayoutContent({ children, currentPageName }) {
                                 {user ? (
                                     <div className="space-y-2">
                                         <div className="px-4 py-2 text-sm text-slate-500">
-                                            Signed in as <span className="font-medium text-slate-700">{user.email}</span>
+                                            {t('profile.signedInAs')} <span className="font-medium text-slate-700">{user.email}</span>
                                         </div>
                                         <Button 
                                             variant="ghost" 
