@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
     MapPin, Globe, GraduationCap, Bookmark, BookmarkCheck, 
     ExternalLink, Award, Calendar, Users, TrendingUp, DollarSign,
-    Building2, BookOpen, Home, Heart, Briefcase, FileText,
-    Shield, Clock, Phone, Mail, CheckCircle2, Info, ChevronRight
+    Building2, BookOpen, Home, Heart,
+    Shield, Phone, Mail, CheckCircle2, Info, ChevronRight
 } from 'lucide-react';
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
 import UniversityCover from '@/components/ui/UniversityCover';

@@ -6,12 +6,11 @@ import { createPageUrl } from '@/utils';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
     Sparkles, Target, TrendingUp, Award, MapPin, 
-    DollarSign, GraduationCap, Globe, Bookmark, BookmarkCheck,
-    ArrowRight, AlertCircle, GitCompare, SlidersHorizontal, X
+    DollarSign, Globe, Bookmark, BookmarkCheck,
+    ArrowRight, AlertCircle, GitCompare, SlidersHorizontal
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UniversityDetailModal from '@/components/search/UniversityDetailModal';
@@ -601,6 +600,7 @@ export default function Recommendations() {
                 onClose={() => setSelectedUniversity(null)}
                 userGpa={userProfile?.gpa}
                 userIelts={userProfile?.english_proficiency}
+                userTopik={userProfile?.topikLevel || "Not taken"}
                 isSaved={selectedUniversity && savedUniversities.includes(selectedUniversity.id)}
                 onSave={handleSave}
             />

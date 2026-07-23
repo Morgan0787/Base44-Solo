@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { apiClient } from '@/lib/apiClient';
 import { invokeAI } from '@/lib/aiService';
 import { useQuery } from '@tanstack/react-query';
@@ -6,11 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { 
     Sparkles, FileText, Lightbulb, Send, Loader2, 
-    CheckCircle2, AlertCircle, TrendingUp, BookOpen
+    CheckCircle2, BookOpen
 } from 'lucide-react';
 import { toast } from 'sonner';
 import FeedbackPanel from '@/components/essay/FeedbackPanel';

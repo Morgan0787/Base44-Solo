@@ -20,6 +20,7 @@ import LanguageSwitcher from '@/components/i18n/LanguageSwitcher';
 
 function LayoutContent({ children, currentPageName }) {
     const { t } = useLanguage();
+    const { user, logout, navigateToLogin } = useAuth();
     
     const navItems = [
         { name: t('nav.home'), path: 'Home', icon: Home },
@@ -28,20 +29,7 @@ function LayoutContent({ children, currentPageName }) {
         { name: t('nav.myProfile'), path: 'Profile', icon: User },
     ];
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [user, setUser] = useState(null);
     const [isScrolled, setIsScrolled] = useState(false);
-
-    useEffect(() => {
-        const checkUser = async () => {
-            try {
-                const currentUser = await apiClient.auth.me();
-                setUser(currentUser);
-            } catch (e) {
-                setUser(null);
-            }
-        };
-        checkUser();
-    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -52,7 +40,7 @@ function LayoutContent({ children, currentPageName }) {
     }, []);
 
     const handleLogout = () => {
-        apiClient.auth.logout();
+        logout();
     };
 
     return (
@@ -138,13 +126,13 @@ function LayoutContent({ children, currentPageName }) {
                                 <>
                                     <Button 
                                         variant="ghost" 
-                                        onClick={() => apiClient.auth.redirectToLogin()}
+                                        onClick={() => navigateToLogin()}
                                     >
                                         {t('nav.signIn')}
                                     </Button>
                                     <Button 
                                         className="bg-indigo-600 hover:bg-indigo-700"
-                                        onClick={() => apiClient.auth.redirectToLogin()}
+                                        onClick={() => navigateToLogin()}
                                     >
                                         {t('nav.getStarted')}
                                     </Button>
@@ -205,7 +193,7 @@ function LayoutContent({ children, currentPageName }) {
                                 ) : (
                                     <Button 
                                         className="w-full bg-indigo-600 hover:bg-indigo-700"
-                                        onClick={() => apiClient.auth.redirectToLogin()}
+                                        onClick={() => navigateToLogin()}
                                     >
                                         {t('nav.signIn')} / {t('nav.getStarted')}
                                     </Button>

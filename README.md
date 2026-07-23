@@ -1,16 +1,43 @@
 # UniMatch
 
-Vite + React + Tailwind app migrated off Base44.
+![UniMatch — matching engine overview](assets/readme/hero.svg)
 
-## Required env vars
+Find universities you can actually get into — not just the ones you dream about. UniMatch compares a student's GPA, IELTS, or TOPIK score against real admission requirements across Europe, the US, and Asia, and ranks results by honest admission chance instead of popularity.
+
+## Why it's different
+
+Most university-search sites are directories: browse, filter, hope. UniMatch inverts that — every listed university carries a transparent match percentage computed from the same numbers admissions officers actually look at (GPA, language scores, acceptance rate), so a student sees realistic reach/target/safety options instead of a wall of logos.
+
+## How it works
+
+- **Frontend** — Vite + React + Tailwind, component library via shadcn/ui
+- **Backend** — Supabase (Postgres + Auth), migrated off the original Base44 platform
+- **Core pages** — `Search`, `Recommendations`, `Profile`, `Login`, plus internal tools (`AdminDataQuality`, `AdminFeedback`, `EssayChecker`)
+
+## Data quality
+
+University records (GPA/IELTS thresholds, deadlines, tuition, scholarships) are collected from official admissions pages rather than generated. Each record is expected to carry a `source_url` and a `verified` flag so the app — and the built-in `AdminDataQuality` tool — can distinguish confirmed data from fields still awaiting verification.
+
+## Getting started
+
+```bash
+npm install
+npm run dev
+```
+
+### Required env vars
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 
-## Optional env vars
+### Optional env vars
 
 - `VITE_LOGIN_URL` (custom login route)
 - `VITE_LLM_FUNCTION_NAME` (default: `invoke-llm`)
 - `VITE_TABLE_UNIVERSITY` (default: `universities`)
 - `VITE_TABLE_STUDENT_PROFILE` (default: `student_profiles`)
 - `VITE_TABLE_USER_FEEDBACK` (default: `user_feedback`)
+
+## Status
+
+Actively developed, pre-launch solo project. Expect incomplete data coverage and rough edges outside the core search/match flow.

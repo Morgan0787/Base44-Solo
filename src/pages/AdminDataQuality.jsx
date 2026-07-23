@@ -10,7 +10,6 @@ import {
     Calendar, Database, Loader2, ShieldAlert, Users
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage } from '@/components/i18n/LanguageContext';
 
 export default function AdminDataQuality() {
     const [user, setUser] = useState(null);
@@ -38,7 +37,7 @@ export default function AdminDataQuality() {
         try {
             toast.loading('Scanning database...', { id: 'scan' });
             
-            const currentYear = 2026;
+            const currentYear = new Date().getFullYear();
             const issues = {
                 corrupted_text: [],
                 missing_fields: [],
@@ -254,7 +253,7 @@ export default function AdminDataQuality() {
             setScanResults(result);
             toast.success(`Scan complete! Fixed ${result.summary.records_fixed} records`, { id: 'scan' });
         } catch (error) {
-            toast.error('Scan failed: ' + error.message, { id: 'scan' });
+            toast.error('Scan failed: ' + (error?.message ?? String(error)), { id: 'scan' });
             console.error('Scan error:', error);
         } finally {
             setIsScanning(false);
@@ -274,6 +273,7 @@ export default function AdminDataQuality() {
             // Group by name (case-insensitive)
             const nameGroups = {};
             universities.forEach(uni => {
+                if (!uni.name || typeof uni.name !== 'string') return;
                 const normalizedName = uni.name.toLowerCase().trim();
                 if (!nameGroups[normalizedName]) {
                     nameGroups[normalizedName] = [];
@@ -360,7 +360,7 @@ export default function AdminDataQuality() {
             
             toast.success(`Removed ${totalRemoved} duplicate records!`, { id: 'duplicates' });
         } catch (error) {
-            toast.error('Duplicate removal failed: ' + error.message, { id: 'duplicates' });
+            toast.error('Duplicate removal failed: ' + (error?.message ?? String(error)), { id: 'duplicates' });
             console.error('Duplicate removal error:', error);
         } finally {
             setIsRemovingDuplicates(false);
