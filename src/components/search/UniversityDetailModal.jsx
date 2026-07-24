@@ -12,6 +12,7 @@ import {
     Shield, Phone, Mail, CheckCircle2, Info, ChevronRight
 } from 'lucide-react';
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
+import EstimatedField from '@/components/ui/EstimatedField';
 import UniversityCover from '@/components/ui/UniversityCover';
 import { useLanguage } from '@/lib/i18n';
 
@@ -153,7 +154,7 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                                     <DollarSign className="w-4 h-4 text-emerald-500 mb-1" />
                                     <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.tuition')}</p>
                                     <p className="font-semibold text-slate-800 text-base truncate">
-                                        {university.tuition_min === 0 ? t('university.free') : `€${university.tuition_min?.toLocaleString()}`}
+                                        {university.tuition_min === 0 ? t('university.free') : university.tuition_min ? `€${university.tuition_min.toLocaleString()}` : <span className="text-slate-400 italic font-normal text-sm">Not published</span>}
                                     </p>
                                 </div>
                                 <div className="p-3 bg-white border border-slate-100 rounded-xl">
@@ -166,13 +167,15 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                                 <div className="p-3 bg-white border border-slate-100 rounded-xl">
                                     <TrendingUp className="w-4 h-4 text-amber-500 mb-1" />
                                     <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.minGpa')}</p>
-                                    <p className="font-semibold text-slate-800 text-base">{university.min_gpa?.toFixed(1)}</p>
+                                    <p className="text-base">
+                                        <EstimatedField value={university.min_gpa} field="gpa" region={university.region} format={(v) => Number(v).toFixed(1)} />
+                                    </p>
                                 </div>
                                 <div className="p-3 bg-white border border-slate-100 rounded-xl">
                                     <Users className="w-4 h-4 text-violet-500 mb-1" />
                                     <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.intlStudents')}</p>
                                     <p className="font-semibold text-slate-800 text-base">
-                                        {university.international_students_percent || "15"}%
+                                        {university.international_students_percent ? `${university.international_students_percent}%` : <span className="text-slate-400 italic font-normal text-sm">Not published</span>}
                                     </p>
                                 </div>
                             </div>
@@ -254,7 +257,10 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                                                 <p className="font-semibold text-slate-800 text-lg">{university.required_ielts}+</p>
                                             </div>
                                         ) : (
-                                            <p className="text-sm text-slate-500 italic">{t('university.variesByProgram')}</p>
+                                            <div>
+                                                <p className="text-sm text-slate-500">{t('university.ieltsRequired')}</p>
+                                                <p className="text-lg"><EstimatedField value={null} field="ielts" region={university.region} unit="+" /></p>
+                                            </div>
                                         )}
                                         {university.country === "South Korea" && university.topikLevel && (
                                             <div>

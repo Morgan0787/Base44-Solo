@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Globe, Bookmark, BookmarkCheck, ExternalLink, Award, GitCompare } from 'lucide-react';
 import ChanceIndicator from '@/components/ui/ChanceIndicator';
+import EstimatedField from '@/components/ui/EstimatedField';
 import { motion } from 'framer-motion';
 import UniversityCover from '@/components/ui/UniversityCover';
 import { useLanguage } from '@/lib/i18n';
@@ -130,24 +131,27 @@ export default function UniversityCard({ university, userGpa, userIelts, userTop
                                 <p className="font-semibold text-slate-800 text-sm truncate">
                                     {university.tuition_min === 0 ? (
                                         <span className="text-emerald-600">{t('university.free')}</span>
+                                    ) : university.tuition_min ? (
+                                        <>€{university.tuition_min.toLocaleString()}</>
                                     ) : (
-                                        <>€{university.tuition_min?.toLocaleString()}</>
+                                        <span className="text-slate-400 italic font-normal text-xs">Not published</span>
                                     )}
                                 </p>
                             </div>
                             <div>
                                 <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.minGpa')}</p>
-                                <p className="font-semibold text-slate-800 text-sm">{university.min_gpa?.toFixed(1)}</p>
+                                <p className="text-sm">
+                                    <EstimatedField value={university.min_gpa} field="gpa" region={university.region} format={(v) => Number(v).toFixed(1)} />
+                                </p>
                             </div>
                         </div>
-                        {university.required_ielts ? (
-                            <div className="text-xs text-slate-600">
-                                <span className="text-slate-500">IELTS:</span> {university.required_ielts}+
-                                {userIelts === 0 && (
-                                    <span className="ml-1 text-amber-600">({t('university.required')})</span>
-                                )}
-                            </div>
-                        ) : null}
+                        <div className="text-xs text-slate-600">
+                            <span className="text-slate-500">IELTS:</span>{' '}
+                            <EstimatedField value={university.required_ielts} field="ielts" region={university.region} unit="+" />
+                            {university.required_ielts && userIelts === 0 && (
+                                <span className="ml-1 text-amber-600">({t('university.required')})</span>
+                            )}
+                        </div>
                         {university.country === "South Korea" && university.topikLevel ? (
                             <div className="text-xs text-slate-600">
                                 <span className="text-slate-500">🇰🇷 TOPIK:</span> {university.topikLevel.split(' ')[1]}+
