@@ -6,8 +6,32 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Mail, Lock, GraduationCap } from 'lucide-react'
+import { Loader2, Mail, Lock, GraduationCap, Chrome } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+
+const getFriendlyAuthError = (error) => {
+  if (!error) return 'Something went wrong. Please try again.'
+
+  const message = error.message || ''
+
+  if (message.includes('Invalid login credentials')) {
+    return 'We could not sign you in. Please check your email and password and try again.'
+  }
+
+  if (message.includes('Email not confirmed')) {
+    return 'Please verify your email before signing in.'
+  }
+
+  if (message.includes('rate limit')) {
+    return 'Too many attempts. Please wait a moment and try again.'
+  }
+
+  if (message.includes('signups not allowed')) {
+    return 'Sign-ups are currently unavailable. Please contact support.'
+  }
+
+  return 'We could not complete that request. Please try again.'
+}
 
 export default function Login() {
   const [searchParams] = useSearchParams()
@@ -19,94 +43,178 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [magicLinkSent, setMagicLinkSent] = useState(false)
+  const [successState, setSuccessState] = useState(null)
 
   useEffect(() => {
     const checkSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
 
-      if (session?.user) {
-        navigate(redirectTo, { replace: true })
+        if (session?.user) {
+          navigate(redirectTo, { replace: true })
+        }
+      } catch (err) {
+        console.warn('Unable to restore session', err)
       }
     }
 
     checkSession()
   }, [navigate, redirectTo])
 
+  const ensureProfile = async (authUser) => {
+    if (!authUser?.id) return
+
+    try {
+      const { data: existingProfile, error: selectError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', authUser.id)
+        .maybeSingle()
+
+      if (selectError && selectError.code !== 'PGRST116') {
+        throw selectError
+      }
+
+      if (existingProfile) {
+        return
+      }
+
+      const { error: insertError } = await supabase.from('profiles').insert({
+        id: authUser.id,
+        email: authUser.email ?? null,
+        full_name: authUser.user_metadata?.full_name || authUser.full_name || null,
+        avatar_url: authUser.user_metadata?.avatar_url || authUser.avatar_url || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+
+      if (insertError) {
+        console.warn('Unable to create profile', insertError)
+      }
+    } catch (err) {
+      console.warn('Unable to create profile', err)
+    }
+  }
+
   const handlePasswordLogin = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccessState(null)
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        throw error
+      }
+
+      if (data?.session?.user) {
+        await ensureProfile(data.session.user)
+        navigate(redirectTo, { replace: true })
+      }
+    } catch (err) {
+      setError(getFriendlyAuthError(err))
+    } finally {
       setLoading(false)
-      return
     }
+  }
 
-    navigate(redirectTo, { replace: true })
+  const handleGoogleSignIn = async () => {
+    setError('')
+    setSuccessState(null)
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+    } catch (err) {
+      setError(getFriendlyAuthError(err))
+      setLoading(false)
+    }
   }
 
   const handleMagicLink = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccessState(null)
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/Login?redirect_to=${encodeURIComponent(redirectTo)}`,
-      },
-    })
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/Login?redirect_to=${encodeURIComponent(redirectTo)}`,
+        },
+      })
 
-    if (error) {
-      setError(error.message)
-    } else {
-      setMagicLinkSent(true)
+      if (error) {
+        throw error
+      }
+
+      setSuccessState({
+        title: 'Check your email',
+        message: `We sent a sign-in link to ${email}. Click it to continue.`,
+      })
+    } catch (err) {
+      setError(getFriendlyAuthError(err))
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleSignUp = async (e) => {
     e.preventDefault()
     setError('')
+    setSuccessState(null)
     setLoading(true)
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/Login?redirect_to=${encodeURIComponent(redirectTo)}`,
-        data: {
-          full_name: fullName,
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/Login?redirect_to=${encodeURIComponent(redirectTo)}`,
+          data: {
+            full_name: fullName,
+          },
         },
-      },
-    })
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        throw error
+      }
+
+      if (data?.session?.user) {
+        await ensureProfile(data.session.user)
+        navigate(redirectTo, { replace: true })
+      } else {
+        setSuccessState({
+          title: 'Verify your email',
+          message: `We sent a confirmation email to ${email}. Please open it to verify your account.`,
+        })
+      }
+    } catch (err) {
+      setError(getFriendlyAuthError(err))
+    } finally {
       setLoading(false)
-      return
     }
-
-    if (data?.session?.user) {
-      navigate(redirectTo, { replace: true })
-    } else {
-      setMagicLinkSent(true)
-    }
-
-    setLoading(false)
   }
 
-  if (magicLinkSent) {
+  if (successState) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
         <Card className="w-full max-w-md text-center">
@@ -114,11 +222,9 @@ export default function Login() {
             <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto">
               <Mail className="w-7 h-7 text-indigo-600" />
             </div>
-            <h2 className="text-xl font-semibold text-slate-800">Check your email</h2>
-            <p className="text-slate-500 text-sm">
-              We sent a link to <span className="font-medium text-slate-700">{email}</span>. Click it to sign in.
-            </p>
-            <Button variant="ghost" size="sm" onClick={() => setMagicLinkSent(false)}>
+            <h2 className="text-xl font-semibold text-slate-800">{successState.title}</h2>
+            <p className="text-slate-500 text-sm">{successState.message}</p>
+            <Button variant="ghost" size="sm" onClick={() => setSuccessState(null)}>
               Use a different method
             </Button>
           </CardContent>
@@ -172,6 +278,10 @@ export default function Login() {
                     />
                   </div>
                   {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
+                  <Button type="button" variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Chrome className="w-4 h-4 mr-2" />}
+                    Continue with Google
+                  </Button>
                   <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={loading}>
                     {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Lock className="w-4 h-4 mr-2" />}
                     Sign In
@@ -237,6 +347,10 @@ export default function Login() {
                     />
                   </div>
                   {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
+                  <Button type="button" variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Chrome className="w-4 h-4 mr-2" />}
+                    Continue with Google
+                  </Button>
                   <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={loading}>
                     {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
                     Create Account
