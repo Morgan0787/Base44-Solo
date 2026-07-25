@@ -3,23 +3,24 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import RequireAuth from '@/components/RequireAuth';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
 const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
+
+const PROTECTED_PAGES = new Set(['Profile', 'Recommendations']);
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
-  const { isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
-  const location = useLocation();
-  const isLoginRoute = location.pathname === '/Login' || location.pathname === '/login';
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
@@ -38,10 +39,6 @@ const AuthenticatedApp = () => {
     }
   }
 
-  if (!isAuthenticated && !isLoginRoute) {
-    return <Navigate to={`/Login?redirect_to=${encodeURIComponent(location.pathname + location.search)}`} replace />;
-  }
-
   return (
     <Routes>
       <Route path="/" element={
@@ -55,7 +52,11 @@ const AuthenticatedApp = () => {
           path={`/${path}`}
           element={
             <LayoutWrapper currentPageName={path}>
-              <Page />
+              {PROTECTED_PAGES.has(path) ? (
+                <RequireAuth><Page /></RequireAuth>
+              ) : (
+                <Page />
+              )}
             </LayoutWrapper>
           }
         />

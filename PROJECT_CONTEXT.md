@@ -1,0 +1,43 @@
+# UniMatch — Project Context
+
+Paste or attach this file at the start of any new AI chat (Claude, ChatGPT, Gemini) to skip re-explaining the project from scratch.
+
+## What it is
+UniMatch matches Central Asian (primarily Uzbek) students to universities in Europe, US, and Asia based on GPA/IELTS/TOPIK, ranked by realistic admission chance rather than popularity. Built by a solo developer as both a portfolio piece (Babson College application) and a potential business.
+
+## Stack
+- Frontend: Vite + React + Tailwind, shadcn/ui
+- Backend: Supabase (Postgres + Auth), migrated off Base44
+- Auth: Supabase Auth with Google OAuth + email, working as of last check
+- Deploy: Vercel
+
+## Database state (Supabase project: UniMatch4.0)
+- `universities` table exists, schema matches frontend code exactly (see Known Gotchas below)
+- ~1944 US universities imported via College Scorecard API (official govt data, no GPA/IELTS — those fields intentionally null for US records)
+- ~24 South Korean universities imported via Gemini-assisted research batches (verified/source_url tracked)
+- ~918 universities across Europe/Asia still NOT imported (batched into 39 CSV files of 25 each, original list sourced from a prior partner's Base44 database that turned out to be mostly synthetic/fabricated data — only name/country/city/website from that source were trustworthy, everything else was regenerated)
+- `student_profiles` and `user_feedback` tables created, RLS enabled
+
+## Known gotchas (don't rediscover these)
+- Column `"topikLevel"` (camelCase, quoted, TEXT type, values like `"TOPIK 4"`) — NOT `topik_level` snake_case integer. Code in 7 files expects this exact format.
+- `user_feedback` sorts by literal column `created_date`, not `created_at`.
+- `tuition_currency_note` is NOT a real column in this Supabase project — don't include it when preparing CSVs.
+- Korean-university tuition figures often come in KRW (millions) not USD — check magnitude before import.
+
+## Product decisions made
+- **Auth gating**: Profile and Recommendations require login (redirect to /Login). Search and Home stay open to everyone.
+- **Missing GPA/IELTS/TOPIK**: shown via `EstimatedField` component — a region-based ballpark range labeled "estimate", never fed into the actual chance-matching calculation. Never invent a specific number for a specific university.
+- **Missing tuition/acceptance_rate/degree_levels/notable_programs**: no synthetic estimate exists for these (too much variance between schools) — show "Not published" instead.
+- **Data sourcing principle**: never accept LLM-generated numbers as fact without a `source_url` and explicit `verified` flag. This whole pipeline exists because a prior partner's data (GPA/IELTS/scholarships) turned out to be AI-fabricated and nearly shipped as real.
+- Do not scrape/reuse data from competitor sites (e.g. Studyportals) — database-rights and ToS risk, plus it undermines the actual differentiator (accuracy).
+
+## Open TODOs
+- 37 of 39 Gemini-research batches still need processing + import
+- `codex/fix-lint-errors-minimally` branch on GitHub is stale/superseded — don't merge without review
+- `npm run lint:fix` would clean ~19 unused-import warnings
+- User acquisition plan (IELTS/tutoring centers, Telegram channels, personal SAT-prep network) designed but not yet executed — this is the actual current bottleneck, not more infrastructure
+
+## Working agreements
+- Prefer official/government data sources over LLM web-research where they exist (e.g. College Scorecard for US) — more accurate, no rate limits, no hallucination risk.
+- When an AI can't verify a fact, it should say so explicitly (empty field / "not verified"), not fill in a plausible-sounding number.
+- Long chat threads get expensive to keep running — start a fresh chat per major task phase, using this file to re-establish context.
