@@ -56,3 +56,11 @@ visa_info, min_gpa, degree_levels. Cards look "empty" because there's genuinely 
 expected per the "never invent data" rule, not something to fix in code. Real fix = data enrichment
 (same Gemini-research process used for the 24 Korean universities), applied to US rows too, or
 prioritize importing the 918 pending Europe/Asia records which have richer data.
+
+
+## Fixed 2026-07-26
+- apiClient.js: min_gpa/tuition_min/tuition_max now use asNullableNumber (were falling back to 0, causing fake "Free" tuition and fake "0.0 GPA" on all US universities)
+- UniversityCard.jsx + UniversityDetailModal.jsx: tuition now shows min–max range when both values exist
+- Root data gap unchanged: all 1944 US rows still lack campus_life/visa_info/international_support/min_gpa — cards will keep showing "Not published" there until real data is imported (see earlier gap note)
+
+
