@@ -85,6 +85,12 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
     const chance = calculateChance(university, userGpa, userIelts, userTopik);
     const totalCost = (university.tuition_min || 0) + (university.living_cost_estimate || 8000);
 
+    // FIX (2026-07-26): tuition_min can now correctly be null (see apiClient.js fix).
+    // Also show tuition_max as a range when it differs from tuition_min, instead of
+    // dropping that data entirely.
+    const hasTuitionMin = university.tuition_min !== null && university.tuition_min !== undefined;
+    const hasTuitionMax = university.tuition_max !== null && university.tuition_max !== undefined && university.tuition_max !== university.tuition_min;
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
@@ -154,7 +160,13 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                                     <DollarSign className="w-4 h-4 text-emerald-500 mb-1" />
                                     <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.tuition')}</p>
                                     <p className="font-semibold text-slate-800 text-base truncate">
-                                        {university.tuition_min === 0 ? t('university.free') : university.tuition_min ? `€${university.tuition_min.toLocaleString()}` : <span className="text-slate-400 italic font-normal text-sm">Not published</span>}
+                                        {university.tuition_min === 0 ? (
+                                            t('university.free')
+                                        ) : hasTuitionMin ? (
+                                            <>€{university.tuition_min.toLocaleString()}{hasTuitionMax && <>–€{university.tuition_max.toLocaleString()}</>}</>
+                                        ) : (
+                                            <span className="text-slate-400 italic font-normal text-sm">Not published</span>
+                                        )}
                                     </p>
                                 </div>
                                 <div className="p-3 bg-white border border-slate-100 rounded-xl">

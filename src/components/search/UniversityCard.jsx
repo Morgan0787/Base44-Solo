@@ -73,7 +73,13 @@ function calculateChance(university, userGpa, userIelts, userTopik) {
 export default function UniversityCard({ university, userGpa, userIelts, userTopik, isSaved, onSave, onView, isComparing, onCompareToggle }) {
     const { t } = useLanguage();
     const chance = calculateChance(university, userGpa, userIelts, userTopik);
-    
+
+    // FIX (2026-07-26): tuition_min can now correctly be null (see apiClient.js fix),
+    // and we also show the tuition_max range when it differs from the min instead of
+    // silently dropping that data.
+    const hasTuitionMin = university.tuition_min !== null && university.tuition_min !== undefined;
+    const hasTuitionMax = university.tuition_max !== null && university.tuition_max !== undefined && university.tuition_max !== university.tuition_min;
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -129,10 +135,15 @@ export default function UniversityCard({ university, userGpa, userIelts, userTop
                             <div>
                                 <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.tuition')}</p>
                                 <p className="font-semibold text-slate-800 text-sm truncate">
-                                    {university.tuition_min === 0 ? (
-                                        <span className="text-emerald-600">{t('university.free')}</span>
-                                    ) : university.tuition_min ? (
-                                        <>€{university.tuition_min.toLocaleString()}</>
+                                    {hasTuitionMin ? (
+                                        university.tuition_min === 0 ? (
+                                            <span className="text-emerald-600">{t('university.free')}</span>
+                                        ) : (
+                                            <>
+                                                €{university.tuition_min.toLocaleString()}
+                                                {hasTuitionMax && <>–€{university.tuition_max.toLocaleString()}</>}
+                                            </>
+                                        )
                                     ) : (
                                         <span className="text-slate-400 italic font-normal text-xs">Not published</span>
                                     )}

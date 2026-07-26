@@ -41,3 +41,18 @@ UniMatch matches Central Asian (primarily Uzbek) students to universities in Eur
 - Prefer official/government data sources over LLM web-research where they exist (e.g. College Scorecard for US) — more accurate, no rate limits, no hallucination risk.
 - When an AI can't verify a fact, it should say so explicitly (empty field / "not verified"), not fill in a plausible-sounding number.
 - Long chat threads get expensive to keep running — start a fresh chat per major task phase, using this file to re-establish context.
+
+
+
+## Bug fixed 2026-07-26
+apiClient.js normalizeUniversity() was coercing null min_gpa/tuition_min to 0 via asNumber(x, 0) fallback.
+This made ALL 1944 US universities show "GPA 0.0" and null-tuition ones show "Free" incorrectly.
+Fix: use asNullableNumber() for min_gpa, tuition_min, tuition_max instead — preserves null so
+EstimatedField/"Not published" fallback logic works as designed.
+
+## Known data gap (not a bug)
+All 1944 US university rows (College Scorecard import) have NULL campus_life, international_support,
+visa_info, min_gpa, degree_levels. Cards look "empty" because there's genuinely no data — this is
+expected per the "never invent data" rule, not something to fix in code. Real fix = data enrichment
+(same Gemini-research process used for the 24 Korean universities), applied to US rows too, or
+prioritize importing the 918 pending Europe/Asia records which have richer data.

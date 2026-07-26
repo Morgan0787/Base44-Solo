@@ -82,9 +82,15 @@ const normalizeUniversity = (university) => {
     degree_levels: asArray(row.degree_levels),
     notable_programs: asArray(row.notable_programs),
     preferred_languages: asArray(row.preferred_languages),
-    tuition_min: asNumber(row.tuition_min, 0),
+    // FIX (2026-07-26): these three used to fall back to 0 via asNumber(x, 0),
+    // which made every US university with a NULL min_gpa show "GPA 0.0" and
+    // every university with a NULL tuition_min show as "Free". Using
+    // asNullableNumber preserves null so EstimatedField / the "Not published"
+    // UI branch can do its job instead of a fake zero looking like real data.
+    tuition_min: asNullableNumber(row.tuition_min),
+    tuition_max: asNullableNumber(row.tuition_max),
     living_cost_estimate: asNumber(row.living_cost_estimate, 8000),
-    min_gpa: asNumber(row.min_gpa, 0),
+    min_gpa: asNullableNumber(row.min_gpa),
     required_ielts: asNullableNumber(row.required_ielts),
     international_students_percent: asNullableNumber(row.international_students_percent),
     scholarships_available: asBoolean(row.scholarships_available),
