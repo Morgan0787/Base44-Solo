@@ -8,6 +8,7 @@ import EstimatedField from '@/components/ui/EstimatedField';
 import { motion } from 'framer-motion';
 import UniversityCover from '@/components/ui/UniversityCover';
 import { useLanguage } from '@/lib/i18n';
+import { US_GPA_HOLISTIC_NOTE } from '@/lib/usGenericInfo';
 
 function calculateChance(university, userGpa, userIelts, userTopik) {
     if (!userGpa) return 'medium';
@@ -79,6 +80,7 @@ export default function UniversityCard({ university, userGpa, userIelts, userTop
     // silently dropping that data.
     const hasTuitionMin = university.tuition_min !== null && university.tuition_min !== undefined;
     const hasTuitionMax = university.tuition_max !== null && university.tuition_max !== undefined && university.tuition_max !== university.tuition_min;
+    const showHolisticGpaNote = university.country === 'United States' && (university.min_gpa === null || university.min_gpa === undefined);
 
     return (
         <motion.div
@@ -152,7 +154,11 @@ export default function UniversityCard({ university, userGpa, userIelts, userTop
                             <div>
                                 <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.minGpa')}</p>
                                 <p className="text-sm">
-                                    <EstimatedField value={university.min_gpa} field="gpa" region={university.region} format={(v) => Number(v).toFixed(1)} />
+                                    {showHolisticGpaNote ? (
+                                        <span className="italic text-slate-500" title={US_GPA_HOLISTIC_NOTE}>Holistic</span>
+                                    ) : (
+                                        <EstimatedField value={university.min_gpa} field="gpa" region={university.region} format={(v) => Number(v).toFixed(1)} />
+                                    )}
                                 </p>
                             </div>
                         </div>

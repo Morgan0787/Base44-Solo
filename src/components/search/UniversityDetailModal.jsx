@@ -15,6 +15,7 @@ import ChanceIndicator from '@/components/ui/ChanceIndicator';
 import EstimatedField from '@/components/ui/EstimatedField';
 import UniversityCover from '@/components/ui/UniversityCover';
 import { useLanguage } from '@/lib/i18n';
+import { US_GENERIC_VISA_INFO, US_GPA_HOLISTIC_NOTE } from '@/lib/usGenericInfo';
 
 function calculateChance(university, userGpa, userIelts, userTopik) {
     if (!userGpa) return 'medium';
@@ -90,6 +91,14 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
     // dropping that data entirely.
     const hasTuitionMin = university.tuition_min !== null && university.tuition_min !== undefined;
     const hasTuitionMax = university.tuition_max !== null && university.tuition_max !== undefined && university.tuition_max !== university.tuition_min;
+
+    // Generic US fallbacks (2026-07-26): US universities import (College Scorecard)
+    // has no visa_info / min_gpa at all. Rather than a blank "not available", show
+    // honest general facts (F-1 visa rules, holistic admissions) clearly labeled as
+    // general — never as this-specific-university data.
+    const isUsUniversity = university.country === 'United States';
+    const showGenericVisa = isUsUniversity && !university.visa_info;
+    const showHolisticGpaNote = isUsUniversity && (university.min_gpa === null || university.min_gpa === undefined);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -180,7 +189,14 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                                     <TrendingUp className="w-4 h-4 text-amber-500 mb-1" />
                                     <p className="text-[10px] text-slate-400 uppercase tracking-wide">{t('university.minGpa')}</p>
                                     <p className="text-base">
-                                        <EstimatedField value={university.min_gpa} field="gpa" region={university.region} format={(v) => Number(v).toFixed(1)} />
+                                        {showHolisticGpaNote ? (
+                                            <span className="italic text-slate-500 text-sm" title={US_GPA_HOLISTIC_NOTE}>
+                                                Holistic admissions
+                                                <span className="ml-1 text-[10px] not-italic uppercase tracking-wide text-slate-400 align-middle">no fixed GPA</span>
+                                            </span>
+                                        ) : (
+                                            <EstimatedField value={university.min_gpa} field="gpa" region={university.region} format={(v) => Number(v).toFixed(1)} />
+                                        )}
                                     </p>
                                 </div>
                                 <div className="p-3 bg-white border border-slate-100 rounded-xl">
@@ -536,6 +552,39 @@ export default function UniversityDetailModal({ university, isOpen, onClose, use
                                                 <p className="text-slate-600 leading-relaxed">{university.visa_info.visa_details}</p>
                                             </div>
                                         )}
+                                    </CardContent>
+                                </Card>
+                            ) : showGenericVisa ? (
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Shield className="w-5 h-5 text-indigo-600" />
+                                            {t('university.visaWorkPermit')}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <Badge variant="outline" className="mb-4 text-amber-600 border-amber-200 bg-amber-50">
+                                            General F-1 visa information — not specific to this university
+                                        </Badge>
+                                        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                                            <div>
+                                                <p className="text-sm text-slate-500 mb-1">{t('university.visaRequired')}</p>
+                                                <Badge>{t('university.yes')}</Badge>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-slate-500 mb-1">{t('university.workAllowed')}</p>
+                                                <p className="font-semibold text-slate-800">{US_GENERIC_VISA_INFO.work_allowed_hours} {t('university.hoursPerWeek')}</p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-6 pt-6 border-t space-y-3">
+                                            <div className="flex items-center gap-3">
+                                                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                                                <p className="text-slate-700">{t('university.postStudyWorkVisa')} (OPT)</p>
+                                            </div>
+                                        </div>
+                                        <div className="mt-6 pt-6 border-t">
+                                            <p className="text-slate-600 leading-relaxed">{US_GENERIC_VISA_INFO.visa_details}</p>
+                                        </div>
                                     </CardContent>
                                 </Card>
                             ) : (

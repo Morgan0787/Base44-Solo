@@ -64,3 +64,25 @@ prioritize importing the 918 pending Europe/Asia records which have richer data.
 - Root data gap unchanged: all 1944 US rows still lack campus_life/visa_info/international_support/min_gpa — cards will keep showing "Not published" there until real data is imported (see earlier gap note)
 
 
+## Added 2026-07-26 — generic US fallback content
+New file src/lib/usGenericInfo.js: US_GENERIC_VISA_INFO, US_GPA_HOLISTIC_NOTE, US_GENERIC_SUPPORT_NOTE.
+These are federal-law/well-documented general facts (F-1 visa rules, holistic admissions norm),
+NOT fabricated per-university data. Wired into UniversityCard.jsx and UniversityDetailModal.jsx:
+- min_gpa null + country=="United States" → show "Holistic admissions" note instead of blank/estimate
+- visa_info null + country=="United States" → show generic F-1 visa card, clearly labeled
+  "General info — not specific to this university"
+Per-university verified data always overrides these when present.
+
+## Next up
+Point-enrich top 200 US universities (by popularity/affordability) via Gemini research batches,
+same process used for the 24 Korean universities — real min_gpa, campus_life, notable_programs,
+international_support per school. Free tier Gemini, manual batches of ~25.
+
+
+
+
+
+
+
+
+
